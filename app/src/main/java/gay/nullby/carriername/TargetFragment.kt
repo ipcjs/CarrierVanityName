@@ -18,6 +18,7 @@ import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
+import com.android.internal.R.attr.country
 import com.android.internal.telephony.ICarrierConfigLoader
 import gay.nullby.carriername.databinding.FragmentTargetBinding
 import rikka.shizuku.ShizukuBinderWrapper
@@ -136,13 +137,14 @@ class TargetFragment : Fragment() {
     private fun getCarrierInfoBySubId(subId: Int): String {
         val telephonyManager = context!!.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
             ?: return ""
-        val name = telephonyManager.getNetworkOperatorName(subId)
-        val country = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        val networkName = telephonyManager.getNetworkOperatorName(subId)
+        val networkCountry = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             SubscriptionManager.getSlotIndex(subId)
                 .takeIf { it != SubscriptionManager.SIM_NOT_INSERTED }
                 ?.let { telephonyManager.getNetworkCountryIso(it) }
         } else null) ?: "Unknown"
-        return "$name - $country"
+        val simCountry = TelephonyManager.getSimCountryIso(subId)
+        return "$networkName - $simCountry"
     }
 
     private fun overrideCarrierConfig(subId: Int, p: PersistableBundle?) {
